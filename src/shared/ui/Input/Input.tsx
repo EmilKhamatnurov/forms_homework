@@ -17,6 +17,7 @@ interface InputProps {
 	disabled?: boolean;
 	withAsterisk?: boolean;
 	icon?: string;
+	prefix?: string; // Добавляем новое поле для фиксированного символа
 }
 
 const Input: FunctionComponent<InputProps> = props => {
@@ -35,7 +36,7 @@ const Input: FunctionComponent<InputProps> = props => {
 		size = 16,
 		disabled,
 		withAsterisk,
-		icon,
+		icon = null,
 	} = props;
 
 	const inputStyles = useMemo<CSSProperties>(() => {
@@ -46,6 +47,16 @@ const Input: FunctionComponent<InputProps> = props => {
 		};
 	}, [radius, size, type]);
 
+	const inputFieldStyles = useMemo<CSSProperties>(() => {
+		return {
+			...(icon ? { paddingLeft: `${size + 3}px` } : {}),
+		};
+	}, [icon, size]);
+
+	const iconValue = useMemo(() => {
+		return typeof icon === 'string' ? icon.slice(0, 1) : '';
+	}, [icon]);
+
 	const inputValue = useMemo(() => {
 		if (type === 'radio') {
 			return radioValue;
@@ -53,19 +64,6 @@ const Input: FunctionComponent<InputProps> = props => {
 			return value;
 		}
 	}, [radioValue, type, value]);
-
-	const inputIcon = useMemo(() => {
-		if (icon) {
-			return (
-				<div
-					style={{ width: `${size}px`, height: `${size}px` }}
-					className={styles['inputIcon']}
-				>
-					{icon}
-				</div>
-			);
-		}
-	}, [icon, size]);
 
 	return (
 		<label style={inputStyles} className={styles['inputLabel']}>
@@ -76,17 +74,23 @@ const Input: FunctionComponent<InputProps> = props => {
 			{description && (
 				<span className={styles['inputDescription']}>{description}</span>
 			)}
-			<input
-				name={name}
-				value={inputValue}
-				onChange={onChange}
-				type={type}
-				placeholder={placeholder}
-				disabled={disabled}
-				defaultChecked={defaultChecked}
-				className={styles['inputField']}
-			/>
-			{inputIcon}
+
+			{/* Обертка для input и префикса */}
+			<div className={styles['inputWrapper']}>
+				{iconValue && <span className={styles['inputIcon']}>{iconValue}</span>}
+				<input
+					name={name}
+					value={inputValue}
+					onChange={onChange}
+					type={type}
+					placeholder={placeholder}
+					disabled={disabled}
+					defaultChecked={defaultChecked}
+					className={styles['inputField']}
+					style={inputFieldStyles}
+				/>
+			</div>
+
 			{error && <span className={styles['inputError']}>{error}</span>}
 		</label>
 	);

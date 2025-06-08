@@ -1,26 +1,31 @@
-import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 import Input from '../../../shared/ui/Input/Input';
 import styles from './styles/Auth.module.scss';
 
 interface SingupProps {
-	handleSubmit?: (value: object) => void;
+	onSubmit: (value: object) => void;
+}
+
+interface InputsType {
+	username: string;
+	nickname: string;
+	password: string;
+	confirm_password: string;
+	email: string;
+	gender: string;
 }
 
 const Singup: FunctionComponent<SingupProps> = props => {
-	const { handleSubmit } = props;
+	const { onSubmit } = props;
 	// States
-	const [value, setValue] = useState({
-		name: '',
+	const [value, setValue] = useState<InputsType>({
+		username: '',
 		nickname: '',
 		password: '',
 		confirm_password: '',
 		email: '',
 		gender: 'Male',
 	});
-
-	useEffect(() => {
-		console.log('####value', value);
-	}, [value]);
 
 	const handleValueChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,12 +34,40 @@ const Singup: FunctionComponent<SingupProps> = props => {
 		[]
 	);
 
+	const handleSubmit = (event: any) => {
+		event.preventDefault();
+		const formElements = event.target as HTMLFormElement;
+		const formDataObject: InputsType = {
+			username: formElements.username.value,
+			nickname: formElements.nickname.value,
+			password: formElements.password.value,
+			confirm_password: formElements.confirm_password.value,
+			email: formElements.email.value,
+			gender: formElements.gender.value,
+		};
+
+		if (Object.values(formDataObject).includes('')) {
+			alert('Все поля должны быть заполнены');
+			console.log(Object.values(formDataObject));
+
+			return;
+		}
+
+		if (formDataObject?.password !== formDataObject.confirm_password) {
+			alert('Пароли должны совпадать');
+			return;
+		}
+
+		onSubmit(formDataObject);
+	};
+
 	return (
 		<form className={styles['form']} onSubmit={handleSubmit}>
 			<Input
-				name='name'
+				withAsterisk={true}
+				name='username'
 				type='text'
-				value={value.name}
+				value={value.username}
 				onChange={handleValueChange}
 				label='Name'
 				radius={5}
@@ -42,6 +75,7 @@ const Singup: FunctionComponent<SingupProps> = props => {
 				description='Имя пользователя'
 			/>
 			<Input
+				withAsterisk={true}
 				name='nickname'
 				type='text'
 				value={value.nickname}
@@ -50,8 +84,10 @@ const Singup: FunctionComponent<SingupProps> = props => {
 				radius={5}
 				size={20}
 				description='Ник'
+				icon='@'
 			/>
 			<Input
+				withAsterisk={true}
 				name='email'
 				type='email'
 				value={value.email}
@@ -80,6 +116,7 @@ const Singup: FunctionComponent<SingupProps> = props => {
 			</div>
 
 			<Input
+				withAsterisk={true}
 				name='password'
 				type='password'
 				value={value.password}
@@ -91,6 +128,7 @@ const Singup: FunctionComponent<SingupProps> = props => {
 			/>
 
 			<Input
+				withAsterisk={true}
 				name='confirm_password'
 				type='password'
 				value={value.confirm_password}

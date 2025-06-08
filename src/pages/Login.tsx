@@ -38,7 +38,7 @@ const Login: FunctionComponent<LoginProps> = () => {
 			</div>
 			{currentTab === 'Войти' && <Singin handleSubmit={handleSubmitLogin} />}
 			{currentTab === 'Зарегистрироваться' && (
-				<Singup handleSubmit={handleSubmitRegister} />
+				<Singup onSubmit={handleSubmitRegister} />
 			)}
 		</div>
 	);
